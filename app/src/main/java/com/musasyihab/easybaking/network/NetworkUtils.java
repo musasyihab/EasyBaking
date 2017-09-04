@@ -1,0 +1,49 @@
+package com.musasyihab.easybaking.network;
+
+import android.support.compat.BuildConfig;
+import android.util.Log;
+
+import com.google.gson.GsonBuilder;
+import com.musasyihab.easybaking.util.Constants;
+
+import java.lang.reflect.Modifier;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+/**
+ * Created by musasyihab on 9/1/17.
+ */
+
+public class NetworkUtils {
+
+    public static Restapi setupRetrofit() {
+        return new Retrofit.Builder()
+                .client(setupOkHttpClient())
+                .baseUrl(Constants.API_PATH)
+                .addConverterFactory(GsonConverterFactory.create(new GsonBuilder()
+                        .excludeFieldsWithModifiers(Modifier.FINAL, Modifier.TRANSIENT, Modifier.STATIC)
+                        .serializeNulls()
+                        .create()))
+                .build()
+                .create(Restapi.class);
+    }
+
+    private static OkHttpClient setupOkHttpClient() {
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
+            @Override
+            public void log(String message) {
+                Log.d(Constants.APP_NAME, message);
+            }
+        });
+        if (BuildConfig.DEBUG) {
+            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        }
+
+        return new OkHttpClient.Builder().addInterceptor(interceptor).
+                readTimeout(Constants.TIMEOUT, TimeUnit.SECONDS).writeTimeout(Constants.TIMEOUT, TimeUnit.SECONDS).build();
+    }
+}
