@@ -17,27 +17,30 @@
 package com.musasyihab.easybaking;
 
 
+import android.content.Context;
+import android.content.Intent;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.musasyihab.easybaking.ui.RecipeStepActivity;
+import com.google.gson.Gson;
+import com.musasyihab.easybaking.model.RecipeModel;
+import com.musasyihab.easybaking.model.StepModel;
 import com.musasyihab.easybaking.ui.StepDetailActivity;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition;
-import static android.support.test.espresso.intent.Intents.intended;
-import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
-import static android.support.test.espresso.intent.matcher.IntentMatchers.hasExtra;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static org.hamcrest.core.AllOf.allOf;
 
 
 @RunWith(AndroidJUnit4.class)
@@ -46,9 +49,33 @@ public class StepDetailActivityBasicTest {
     private String RECIPE_DESC_0 = "Recipe Introduction";
     private String RECIPE_DESC_1 = "1. Preheat the oven to 350°F. Butter a 9\\\" deep dish pie pan.";
 
+    private RecipeModel generateDummyRecipe(){
+        RecipeModel recipe = new RecipeModel();
+        List<StepModel> steps = new ArrayList<>();
+        StepModel step0 = new StepModel();
+        step0.setDescription(RECIPE_DESC_0);
+        steps.add(step0);
+        StepModel step1 = new StepModel();
+        step1.setDescription(RECIPE_DESC_1);
+        steps.add(step1);
+        recipe.setSteps(steps);
+        return recipe;
+    }
+
     @Rule
     public ActivityTestRule<StepDetailActivity> mActivityTestRule =
-            new ActivityTestRule<>(StepDetailActivity.class);
+            new ActivityTestRule<StepDetailActivity>(StepDetailActivity.class){
+                @Override
+                protected Intent getActivityIntent() {
+                    Context targetContext = InstrumentationRegistry.getInstrumentation()
+                            .getTargetContext();
+                    Intent result = new Intent(targetContext, StepDetailActivity.class);
+                    RecipeModel dummyRecipe = generateDummyRecipe();
+                    result.putExtra(StepDetailActivity.RECIPE, new Gson().toJson(dummyRecipe));
+                    result.putExtra(StepDetailActivity.CURRENT_POS, 0);
+                    return result;
+                }
+            };
 
     @Test
     public void containPrevAndNextButton() {
