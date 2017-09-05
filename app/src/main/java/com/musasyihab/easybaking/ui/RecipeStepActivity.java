@@ -196,8 +196,6 @@ public class RecipeStepActivity extends AppCompatActivity implements LoaderManag
         mStepList.setAdapter(mAdapter);
         mStepList.setNestedScrollingEnabled(false);
 
-        mLayout.scrollTo(0, 0);
-
         if(mActionBar!=null){
             mActionBar.setTitle(recipe.getName());
         }
