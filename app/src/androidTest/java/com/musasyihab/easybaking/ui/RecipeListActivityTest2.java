@@ -8,6 +8,8 @@ import android.test.suitebuilder.annotation.LargeTest;
 
 import com.musasyihab.easybaking.R;
 
+import junit.framework.AssertionFailedError;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -58,8 +60,10 @@ public class RecipeListActivityTest2 {
         openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
 
         ViewInteraction appCompatTextView = onView(
-                allOf(withId(R.id.title), withText("Add To Widget"), isDisplayed()));
+                allOf(withId(R.id.title), isDisplayed()));
         appCompatTextView.perform(click());
+
+
 
         pressBack();
 

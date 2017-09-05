@@ -15,6 +15,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.NotificationCompat;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -174,35 +175,50 @@ public class StepDetailActivity extends AppCompatActivity implements ExoPlayer.E
 
         if(currentStep.getVideoURL()!=null && !currentStep.getVideoURL().isEmpty()){
             sourceURL = currentStep.getVideoURL();
-            mPlayerView.setVisibility(View.VISIBLE);
-            mImageView.setVisibility(View.GONE);
-
-            // Load the question mark as the background image until the user answers the question.
-            mPlayerView.setDefaultArtwork(BitmapFactory.decodeResource
-                    (getResources(), R.drawable.ic_restaurant_menu_green));
-
-            // Initialize the Media Session.
-            initializeMediaSession();
-
-            // Initialize the player.
-            initializePlayer(Uri.parse(sourceURL));
 
         } else if (currentStep.getThumbnailURL()!=null && !currentStep.getThumbnailURL().isEmpty()){
             sourceURL = currentStep.getThumbnailURL();
-            mPlayerView.setVisibility(View.GONE);
-            mImageView.setVisibility(View.VISIBLE);
 
-            if(isURLImage()) {
-                Glide.with(this).load(sourceURL)
-                        .skipMemoryCache(false).diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .error(R.drawable.ic_restaurant_menu_white)
-                        .into(mImageView);
-            }
         } else {
             mPlayerView.setVisibility(View.GONE);
             mImageView.setVisibility(View.GONE);
             mPlayerLayout.setVisibility(View.GONE);
+
+            return;
         }
+
+        if(getMimeType(sourceURL).startsWith("image")) {
+            loadImage();
+        } else if (getMimeType(sourceURL).startsWith("video")){
+            loadVideo();
+        }
+
+
+    }
+
+    private void loadImage(){
+        mPlayerView.setVisibility(View.GONE);
+        mImageView.setVisibility(View.VISIBLE);
+
+        Glide.with(this).load(sourceURL)
+                .skipMemoryCache(false).diskCacheStrategy(DiskCacheStrategy.ALL)
+                .error(R.drawable.ic_restaurant_menu_white)
+                .into(mImageView);
+    }
+
+    private void loadVideo(){
+        mPlayerView.setVisibility(View.VISIBLE);
+        mImageView.setVisibility(View.GONE);
+
+        // Load the question mark as the background image until the user answers the question.
+        mPlayerView.setDefaultArtwork(BitmapFactory.decodeResource
+                (getResources(), R.drawable.ic_restaurant_menu_green));
+
+        // Initialize the Media Session.
+        initializeMediaSession();
+
+        // Initialize the player.
+        initializePlayer(Uri.parse(sourceURL));
     }
 
     @Override
@@ -219,6 +235,15 @@ public class StepDetailActivity extends AppCompatActivity implements ExoPlayer.E
                 || sourceURL.endsWith(".gif");
 
         return isImage;
+    }
+
+    private String getMimeType(String url) {
+        String type = null;
+        String extension = MimeTypeMap.getFileExtensionFromUrl(url);
+        if (extension != null) {
+            type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+        }
+        return type;
     }
 
     /**

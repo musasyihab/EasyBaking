@@ -17,7 +17,10 @@
 package com.musasyihab.easybaking;
 
 
+import android.content.Context;
 import android.content.Intent;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -30,14 +33,11 @@ import org.junit.runner.RunWith;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition;
 import static android.support.test.espresso.intent.Intents.intended;
-import static android.support.test.espresso.intent.matcher.IntentMatchers.hasAction;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasExtra;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.core.AllOf.allOf;
 
 
@@ -45,11 +45,26 @@ import static org.hamcrest.core.AllOf.allOf;
 public class RecipeStepActivityBasicTest {
 
     @Rule
-    public ActivityTestRule<RecipeStepActivity> mActivityTestRule =
-            new ActivityTestRule<>(RecipeStepActivity.class);
+    public IntentsTestRule<RecipeStepActivity> mActivityTestRule =
+            new IntentsTestRule<RecipeStepActivity>(RecipeStepActivity.class){
+                @Override
+                protected Intent getActivityIntent() {
+                    Context targetContext = InstrumentationRegistry.getInstrumentation()
+                            .getTargetContext();
+                    Intent result = new Intent(targetContext, RecipeStepActivity.class);
+                    result.putExtra(RecipeStepActivity.RECIPE_ID, 1);
+                    return result;
+                }
+            };
 
     @Test
     public void openStepDetailActivityWhenClickStep() {
+
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         onView(withId(R.id.recipe_step_list))
                 .perform(actionOnItemAtPosition(0, click()));

@@ -54,17 +54,17 @@ public class RecipeListActivityTest3 {
 
         ViewInteraction appCompatButton = onView(
                 allOf(withId(R.id.step_detail_next), withText("Next Step")));
-        appCompatButton.perform(scrollTo(), click());
+        appCompatButton.perform(click());
 
         ViewInteraction appCompatButton2 = onView(
                 allOf(withId(R.id.step_detail_next), withText("Next Step")));
-        appCompatButton2.perform(scrollTo(), click());
+        appCompatButton2.perform(click());
 
         // Added a sleep statement to match the app's execution delay.
         // The recommended way to handle such scenarios is to use Espresso idling resources:
         // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
         try {
-            Thread.sleep(5000);
+            Thread.sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -77,7 +77,7 @@ public class RecipeListActivityTest3 {
         // The recommended way to handle such scenarios is to use Espresso idling resources:
         // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
         try {
-            Thread.sleep(5000);
+            Thread.sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -129,7 +129,7 @@ public class RecipeListActivityTest3 {
         // The recommended way to handle such scenarios is to use Espresso idling resources:
         // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
         try {
-            Thread.sleep(5000);
+            Thread.sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
