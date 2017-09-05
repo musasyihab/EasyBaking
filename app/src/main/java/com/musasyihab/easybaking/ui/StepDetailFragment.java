@@ -56,6 +56,7 @@ import java.util.List;
 public class StepDetailFragment extends Fragment implements ExoPlayer.EventListener {
     public static final String RECIPE = "RECIPE";
     public static final String CURRENT_POS = "CURRENT_POS";
+    public static final String LAST_POS = "LAST_POS";
 
     private static final String TAG = StepDetailFragment.class.getSimpleName();
     private static MediaSessionCompat mMediaSession;
@@ -75,6 +76,7 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
     private StepModel currentStep;
     private int currentPosition = 0;
     private String sourceURL;
+    private long lastPos;
 
     private Activity activity;
 
@@ -94,6 +96,9 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
             }
             if(savedInstanceState.containsKey(CURRENT_POS)){
                 currentPosition = savedInstanceState.getInt(CURRENT_POS, 0);
+            }
+            if(savedInstanceState.containsKey(LAST_POS)){
+                lastPos = savedInstanceState.getLong(LAST_POS, 0);
             }
         }
     }
@@ -362,6 +367,24 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
         releasePlayer();
         if(mMediaSession!=null)
             mMediaSession.setActive(false);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(mExoPlayer!=null){
+            mExoPlayer.seekTo(lastPos);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if(mExoPlayer!=null){
+            lastPos = mExoPlayer.getCurrentPosition();
+        } else {
+            lastPos = 0;
+        }
     }
 
     // ExoPlayer Event Listeners
