@@ -154,9 +154,13 @@ public class RecipeStepActivity extends AppCompatActivity implements LoaderManag
     }
 
     private void saveToPreference(){
+        int id = recipeId;
+        if(!isWidgetAdded) {
+           id = -1;
+        }
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt(Constants.SAVED_TO_WIDGET_RECIPE_ID, recipeId);
+        editor.putInt(Constants.SAVED_TO_WIDGET_RECIPE_ID, id);
         editor.apply();
     }
 

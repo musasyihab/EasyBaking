@@ -49,24 +49,26 @@ public class RecipeWidgetProvider extends AppWidgetProvider {
         RecipeModel mRecipe = MyProvider.getRecipe(context, recipeId);
 
         Intent intent;
-        if (recipeId == -1) {
+        RemoteViews views;
+        if (recipeId == -1 || mRecipe==null) {
             intent = new Intent(context, RecipeStepActivity.class);
+            views = new RemoteViews(context.getPackageName(), R.layout.recipe_widget_empty);
         } else {
             Log.d(RecipeWidgetProvider.class.getSimpleName(), "recipeId=" + recipeId);
             intent = new Intent(context, RecipeStepActivity.class);
             intent.putExtra(RecipeStepActivity.RECIPE_ID, recipeId);
+
+            views = new RemoteViews(context.getPackageName(), R.layout.recipe_widget_single);
+
+            String ingredientsText = "";
+            for (int i=0; i<mRecipe.getIngredients().size(); i++){
+                ingredientsText = ingredientsText + "- " + mRecipe.getIngredients().get(i).getIngredient() + "\n";
+            }
+
+            views.setTextViewText(R.id.recipe_widget_name, mRecipe.getName());
+            views.setTextViewText(R.id.recipe_widget_desc, ingredientsText);
         }
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.recipe_widget_single);
-
-        String ingredientsText = "";
-        for (int i=0; i<mRecipe.getIngredients().size(); i++){
-            ingredientsText = ingredientsText + "- " + mRecipe.getIngredients().get(i).getIngredient() + "\n";
-        }
-
-        views.setTextViewText(R.id.recipe_widget_name, mRecipe.getName());
-        views.setTextViewText(R.id.recipe_widget_desc, ingredientsText);
-
 
         views.setOnClickPendingIntent(R.id.recipe_widget_layout, pendingIntent);
 
