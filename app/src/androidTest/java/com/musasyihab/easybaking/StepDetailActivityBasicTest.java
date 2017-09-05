@@ -47,8 +47,8 @@ public class StepDetailActivityBasicTest {
     private String RECIPE_DESC_1 = "1. Preheat the oven to 350°F. Butter a 9\\\" deep dish pie pan.";
 
     @Rule
-    public ActivityTestRule<RecipeStepActivity> mActivityTestRule =
-            new ActivityTestRule<>(RecipeStepActivity.class);
+    public ActivityTestRule<StepDetailActivity> mActivityTestRule =
+            new ActivityTestRule<>(StepDetailActivity.class);
 
     @Test
     public void containPrevAndNextButton() {
