@@ -34,6 +34,7 @@ import static android.support.test.espresso.contrib.RecyclerViewActions.actionOn
 import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasExtra;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.core.AllOf.allOf;
@@ -42,19 +43,29 @@ import static org.hamcrest.core.AllOf.allOf;
 @RunWith(AndroidJUnit4.class)
 public class StepDetailActivityBasicTest {
 
-    private String RECIPE_DESC = "1. Preheat the oven to 350°F. Butter a 9\\\" deep dish pie pan.";
+    private String RECIPE_DESC_0 = "Recipe Introduction";
+    private String RECIPE_DESC_1 = "1. Preheat the oven to 350°F. Butter a 9\\\" deep dish pie pan.";
 
     @Rule
     public ActivityTestRule<RecipeStepActivity> mActivityTestRule =
             new ActivityTestRule<>(RecipeStepActivity.class);
 
     @Test
-    public void changeDescriptionWhenClickNext() {
+    public void containPrevAndNextButton() {
+        onView(withId(R.id.step_detail_prev)).check(matches(isDisplayed()));
+        onView(withId(R.id.step_detail_next)).check(matches(isDisplayed()));
+    }
 
+    @Test
+    public void containCorrectDescription() {
+        onView(withId(R.id.step_detail_desc)).check(matches(withText(RECIPE_DESC_0)));
+    }
+
+    @Test
+    public void changeDescriptionWhenClickNext() {
         onView(withId(R.id.step_detail_next))
                 .perform(click());
-
-        onView(withId(R.id.step_detail_desc)).check(matches(withText(RECIPE_DESC)));
+        onView(withId(R.id.step_detail_desc)).check(matches(withText(RECIPE_DESC_1)));
 
     }
 }

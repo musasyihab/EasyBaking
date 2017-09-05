@@ -6,19 +6,26 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.util.Log;
+import android.view.View;
 import android.widget.RemoteViews;
 
 import com.musasyihab.easybaking.R;
+import com.musasyihab.easybaking.data.MyProvider;
+import com.musasyihab.easybaking.model.RecipeModel;
 import com.musasyihab.easybaking.ui.RecipeListActivity;
+import com.musasyihab.easybaking.ui.RecipeStepActivity;
 
 public class RecipeWidgetProvider extends AppWidgetProvider {
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
         RemoteViews rv;
-        rv = getGardenGridRemoteView(context);
+        rv = getRecipeSingleRemoteView(context);
 
         appWidgetManager.updateAppWidget(appWidgetId, rv);
     }
@@ -34,7 +41,39 @@ public class RecipeWidgetProvider extends AppWidgetProvider {
         RecipeWidgetService.startActionUpdateRecipeWidgets(context);
     }
 
-    private static RemoteViews getGardenGridRemoteView(Context context) {
+    private static RemoteViews getRecipeSingleRemoteView(Context context) {
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        int recipeId =  preferences.getInt(Constants.SAVED_TO_WIDGET_RECIPE_ID, -1);
+
+        RecipeModel mRecipe = MyProvider.getRecipe(context, recipeId);
+
+        Intent intent;
+        if (recipeId == -1) {
+            intent = new Intent(context, RecipeStepActivity.class);
+        } else {
+            Log.d(RecipeWidgetProvider.class.getSimpleName(), "recipeId=" + recipeId);
+            intent = new Intent(context, RecipeStepActivity.class);
+            intent.putExtra(RecipeStepActivity.RECIPE_ID, recipeId);
+        }
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.recipe_widget_single);
+
+        String ingredientsText = "";
+        for (int i=0; i<mRecipe.getIngredients().size(); i++){
+            ingredientsText = ingredientsText + "- " + mRecipe.getIngredients().get(i).getIngredient() + "\n";
+        }
+
+        views.setTextViewText(R.id.recipe_widget_name, mRecipe.getName());
+        views.setTextViewText(R.id.recipe_widget_desc, ingredientsText);
+
+
+        views.setOnClickPendingIntent(R.id.recipe_widget_layout, pendingIntent);
+
+        return views;
+    }
+
+    private static RemoteViews getRecipeGridRemoteView(Context context) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.recipe_widget_grid);
         Intent intent = new Intent(context, GridWidgetService.class);
         views.setRemoteAdapter(R.id.widget_grid_view, intent);

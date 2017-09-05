@@ -74,7 +74,7 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder
 
         void bind(StepModel step) {
             if(step!=null) {
-                stepName.setText(step.getDescription());
+                stepName.setText((getAdapterPosition() + 1) + ". " + step.getShortDescription());
             }
         }
 

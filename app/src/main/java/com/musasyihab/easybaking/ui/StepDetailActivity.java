@@ -17,8 +17,11 @@ import android.support.v7.app.NotificationCompat;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -59,6 +62,7 @@ public class StepDetailActivity extends AppCompatActivity implements ExoPlayer.E
     private SimpleExoPlayer mExoPlayer;
 
     private FrameLayout mPlayerLayout;
+    private ImageView mImageView;
     private SimpleExoPlayerView mPlayerView;
     private Button mBtnNext;
     private Button mBtnPrev;
@@ -69,7 +73,7 @@ public class StepDetailActivity extends AppCompatActivity implements ExoPlayer.E
     private List<StepModel> stepList;
     private StepModel currentStep;
     private int currentPosition = 0;
-    private String videoURL;
+    private String sourceURL;
 
 
     @Override
@@ -79,6 +83,7 @@ public class StepDetailActivity extends AppCompatActivity implements ExoPlayer.E
 
         mPlayerLayout = (FrameLayout) findViewById(R.id.step_detail_video_layout);
         mPlayerView = (SimpleExoPlayerView) findViewById(R.id.step_detail_video);
+        mImageView = (ImageView) findViewById(R.id.step_detail_thumb);
         mBtnNext = (Button) findViewById(R.id.step_detail_next);
         mBtnPrev = (Button) findViewById(R.id.step_detail_prev);
         mDescription = (TextView) findViewById(R.id.step_detail_desc);
@@ -162,13 +167,11 @@ public class StepDetailActivity extends AppCompatActivity implements ExoPlayer.E
 
         mPlayerLayout.setVisibility(View.VISIBLE);
 
-        if(currentStep.getVideoURL()!=null){
-            videoURL = currentStep.getVideoURL();
-        } else if (currentStep.getThumbnailURL()!=null){
-            videoURL = currentStep.getThumbnailURL();
-        }
+        if(currentStep.getVideoURL()!=null && !currentStep.getVideoURL().isEmpty()){
+            sourceURL = currentStep.getVideoURL();
+            mPlayerView.setVisibility(View.VISIBLE);
+            mImageView.setVisibility(View.GONE);
 
-        if(videoURL!=null && !videoURL.isEmpty()) {
             // Load the question mark as the background image until the user answers the question.
             mPlayerView.setDefaultArtwork(BitmapFactory.decodeResource
                     (getResources(), R.drawable.ic_restaurant_menu_green));
@@ -177,9 +180,22 @@ public class StepDetailActivity extends AppCompatActivity implements ExoPlayer.E
             initializeMediaSession();
 
             // Initialize the player.
-            initializePlayer(Uri.parse(videoURL));
+            initializePlayer(Uri.parse(sourceURL));
 
+        } else if (currentStep.getThumbnailURL()!=null && !currentStep.getThumbnailURL().isEmpty()){
+            sourceURL = currentStep.getThumbnailURL();
+            mPlayerView.setVisibility(View.GONE);
+            mImageView.setVisibility(View.VISIBLE);
+
+            if(isURLImage()) {
+                Glide.with(this).load(sourceURL)
+                        .skipMemoryCache(false).diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .error(R.drawable.ic_restaurant_menu_white)
+                        .into(mImageView);
+            }
         } else {
+            mPlayerView.setVisibility(View.GONE);
+            mImageView.setVisibility(View.GONE);
             mPlayerLayout.setVisibility(View.GONE);
         }
     }
@@ -190,6 +206,13 @@ public class StepDetailActivity extends AppCompatActivity implements ExoPlayer.E
         outState.putString(RECIPE, sRecipe);
         outState.putInt(CURRENT_POS, currentPosition);
         super.onSaveInstanceState(outState);
+    }
+
+    private boolean isURLImage(){
+        boolean isImage = sourceURL.endsWith(".jpg") || sourceURL.endsWith(".jpeg") || sourceURL.endsWith(".bmp") || sourceURL.endsWith(".png")
+                || sourceURL.endsWith(".gif");
+
+        return isImage;
     }
 
     /**
@@ -327,6 +350,13 @@ public class StepDetailActivity extends AppCompatActivity implements ExoPlayer.E
             mMediaSession.setActive(false);
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        releasePlayer();
+        if(mMediaSession!=null)
+            mMediaSession.setActive(false);
+    }
 
     // ExoPlayer Event Listeners
 

@@ -13,4 +13,6 @@ public class Constants {
     public static final int GET_ALL_RECIPES_LOADER = 91;
 
     public static final int GET_RECIPE_DETAIL_LOADER = 100;
+
+    public static final String SAVED_TO_WIDGET_RECIPE_ID = "SAVED_TO_WIDGET_RECIPE_ID";
 }

@@ -14,7 +14,15 @@
         <com.google.android.exoplayer2.ui.SimpleExoPlayerView
             android:id="@+id/step_detail_video"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:visibility="visible"/>
+
+        <ImageView
+            android:id="@+id/step_detail_thumb"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_restaurant_menu_white"
+            android:visibility="gone"/>
 
     </FrameLayout>
 

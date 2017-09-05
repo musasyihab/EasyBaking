@@ -1,8 +1,10 @@
 package com.musasyihab.easybaking.ui;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -137,7 +139,7 @@ public class RecipeStepActivity extends AppCompatActivity implements LoaderManag
             protected Void doInBackground(Void... voids) {
                 isWidgetAdded = !isWidgetAdded;
                 recipe.setWidgetAdded(isWidgetAdded);
-                MyProvider.insertRecipe(RecipeStepActivity.this, recipe);
+                saveToPreference();
                 return null;
             }
 
@@ -149,6 +151,20 @@ public class RecipeStepActivity extends AppCompatActivity implements LoaderManag
         };
 
         insertRecipesTask.execute();
+    }
+
+    private void saveToPreference(){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(Constants.SAVED_TO_WIDGET_RECIPE_ID, recipeId);
+        editor.apply();
+    }
+
+    private boolean isRecipeSaved(){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        int saved =  preferences.getInt(Constants.SAVED_TO_WIDGET_RECIPE_ID, -1);
+
+        return saved>0 && saved==recipeId;
     }
 
     private void getRecipeDetail(){
@@ -182,7 +198,7 @@ public class RecipeStepActivity extends AppCompatActivity implements LoaderManag
             mActionBar.setTitle(recipe.getName());
         }
 
-        isWidgetAdded = recipe.isWidgetAdded();
+        isWidgetAdded = isRecipeSaved();
         updateAddWidgetMenuText();
     }
 
